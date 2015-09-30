@@ -20,6 +20,9 @@ $RECYCLE.BIN/
 # Intellij IDEA 
 .idea
 
+# NodeJS node_modules
+node_modules
+
 # =========================
 # Operating System Files
 # =========================
