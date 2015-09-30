@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>首页</title>
+        <link type="text/css" rel="stylesheet" href="../css/base.css">
+        <script type="text/javascript" src="../js/jquery-2.1.1.min.js"></script>
+        <script type="text/javascript" src="https://cdn1.lncld.net/static/js/av-mini-0.6.1.js"></script>
+    </head>
+    <body>
+        <h4>首页</h4>
+
+        <a href="#" id="saveMsg">保存测试</a>
+        <p id="msg"></p>
+        <a href="#" id="queryMsg">查询测试</a>
+        <ul id="msgs"></ul>
+
+        <form onsubmit="return false;">
+            <label rel="username">用户名：</label>
+            <input type="text" name="username" value="" id="username" placeholder="请输入用户名"/>
+            <br/>
+            <label rel="password">密码：</label>
+            <input type="password" name="password" id="password" placeholder="请输入密码"/>
+            <br/>
+            <label rel="email">邮箱：</label>
+            <input type="text" name="email" value="" id="email" placeholder="请输入邮箱"/>
+            <br/>
+            <label rel="mobilePhoneNumber">手机号：</label>
+            <input type="text" name="mobilePhoneNumber" value="" id="mobilePhoneNumber" placeholder="请输入手机号码"/>
+            <br/>
+            <input type="submit" value="注册" onclick="signUp()"/>
+        </form>
+
+        <form onsubmit="return false;">
+            <label rel="username1">用户名：</label>
+            <input type="text" name="username1" value="" id="username1" placeholder="请输入用户名"/>
+            <br/>
+            <label rel="password1">密码：</label>
+            <input type="password" name="password1" id="password1" placeholder="请输入密码"/>
+            <br/>
+            <input type="submit" value="登陆" onclick="logIn()"/>
+        </form>
+
+        <a href="#" id="cloudFuncTest">云函数测试</a>
+
+        <script type="text/javascript" src="../js/main.js"></script>
+        <script type="text/javascript">
+            $(function(){
+                $('#saveMsg').click(function(){
+                    var message = new LCEntity.Message();
+                    message.set('content', 'Hello World!');
+                    message.set('code', 200);
+                    message.save(null, {
+                        success: function(msg){
+                            $('#msg').html(msg.get('content'));
+                            console.dir(msg)
+                        },
+                        error: function(msg, error){
+                            alert('失败: ' + (error.code) + '_' + (error.message));
+                        }
+                    });
+                });
+
+                $('#queryMsg').click(function(){
+                    var msgQuery = new AV.Query(LCEntity.Message);
+                    msgQuery.equalTo('code', 200);
+                    msgQuery.find().then(function(results){
+                        console.log('查询成功: length = ' + (results.length));
+                        $('#msgs').html('');
+                        for (var i = 0; i < results.length; i ++) {
+                            var obj = results[i];
+                            $('#msgs').append('<li>' + (i + 1) + ': ' + obj.get('code') + '_' + obj.get('content') + '</li>');
+                        }
+                    }, function(error){
+                        alert('失败: ' + (error.code) + '_' + (error.message));
+                    });
+                });
+
+                $('#cloudFuncTest').click(function(){
+                    AV.Cloud.run('func', {}, {
+                        success: function(data){
+                            alert('云函数调用结果: ' + data.name + ',' + data.code);
+                        },
+                        error: function (error) {
+                            alert('失败: ' + (error.code) + '_' + (error.message));
+                        }
+                    });
+                });
+            });
+
+            function signUp() {
+                var user = new AV.User();
+                user.set('username', $('#username').val());
+                user.set('password', $('#password').val());
+                user.set('email', $('#email').val());
+                user.set('mobilePhoneNumber', $('#mobilePhoneNumber').val());
+
+                user.signUp(null, {
+                    success: function(user){
+                        alert('注册成功');
+                        console.dir(user);
+                    },
+                    error: function(user, error){
+                        alert('失败: ' + (error.code) + '_' + (error.message));
+                    }
+                });
+            }
+
+            function logIn() {
+                var username = $('#username1').val();
+                var password = $('#password1').val();
+                AV.User.logIn(username, password, {
+                    success: function(user){
+                        alert('登陆成功');
+                        console.dir(user);
+                    },
+                    error: function(user, error){
+                        alert('失败: ' + (error.code) + '_' + (error.message));
+                    }
+                });
+            }
+        </script>
+    </body>
+</html>
