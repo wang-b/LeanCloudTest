@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>首页</title>
+        <link type="text/css" rel="stylesheet" href="../css/base.css">
+        <script type="text/javascript" src="../js/jquery-2.1.1.min.js"></script>
+        <script type="text/javascript" src="https://cdn1.lncld.net/static/js/av-mini-0.6.1.js"></script>
+    </head>
+    <body>
+        <h4>首页</h4>
+
+        <a href="#" id="meTest">meTest</a>
+        <a href="#" id="cache">cache</a>
+        <a href="#" id="cacheTest">cacheTest</a>
+
+        <ul id="cacheData">
+
+        </ul>
+        <script type="text/javascript">
+            $(function(){
+                var LCConstants = {
+                    appID: '1YaglwHXhOV3mIsBkCxXTDwG',
+                    appKey: 'eq3AEgKOQvU6Oqn9Dgc0blgM',
+                    masterKey: 'Qn73dECkOgYOzn0Axwtk3wzn'
+                };
+                AV.initialize(LCConstants.appID, LCConstants.appKey);
+
+                var Cache = AV.Object.extend("Cache");
+
+                $("#meTest").click(function(){
+                    AV.Cloud.run('hello', {}, {
+                        success: function (result) {
+                            console.log(result);
+                            alert(result);
+                        },
+                        error: function (error) {
+                            console(error.message);
+                        }
+                    });
+                });
+
+                $("#cache").click(function(){
+                    AV.Cloud.run('cache', {}, {
+                        success: function (result) {
+                            console.log(result);
+                        },
+                        error: function (error) {
+                            console(error.message);
+                        }
+                    });
+                });
+
+                $("#cacheTest").click(function(){
+                    var cacheQuery = new AV.Query(Cache);
+                    cacheQuery.find().then(function(results){
+                        console.log("当前的文件数:" + results.length);
+                        var idx = results.length - 1;
+                        var obj = results[idx];
+                        var json = obj.get("json");
+                        var url = obj.get("json").url();
+                        console.log(url);
+                        console.dir(json);
+                        alert(url);
+
+                        //读取json
+                        $("#cacheData").html("");
+                        $.getJSON(url, function(data){
+                            $.each(data.result, function(i, info){
+                                $("#cacheData").append("<li>" + info.name + "," + info.content + "</li>");
+                            });
+                        });
+                    }, function(error){
+                        console(error.message);
+                    });
+                });
+            });
+        </script>
+    </body>
+</html>
